@@ -1,0 +1,26 @@
+
+huffman.cpp
+
+	methods:
+		-inTree(char ch): checks to see if a char value is in the actual tree. Returns a boolean.
+		-GetFrequency(char ch): returns how many times a letter occurs in a file by returning the weight of the character
+		-GetFrequency(int i): private method, returns frequency to public 			
+		-GetFrequency(char ch): returns index if it exists in tree
+		-lookUp(char ch): checks to see if character is actually in tree,returns index if it exists in tree
+		-GetCode(int i) & GetCode(char ch): private and public methods respectivly, returns path to particular character in huffmanTree
+		-PrintTable(): Prints out HuffmanTree
+		-Build(): algorithm to build HuffmanTree, finds two smallest nodes and makes them the children of a total node. continues mergering
+			 until there is only one node left in the tree
+
+zip.cpp
+	
+	algorithm summary: read in a file, if there was invalid input the user was notified. Read in characters from the file and populated vector. 
+	Then called build() to create the tree. Ascii and GetCode data was outputed into a new file with a .zip extension
+
+unzip.cpp
+	
+	algorithm summary: read in .zip file, if there was invalid input the user was notified. read data in from file and inputted GetCode string and
+		char value into map object. The totalCode string containing all the GetCode values was parsed and once a value was recongized it was 
+		converted back into a char and attachted to a string called reinflated until the entire totalCode string was parsed. The reinflated 
+		string was saved out to a file with the .zip removed.   		
+		

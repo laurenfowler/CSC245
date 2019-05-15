@@ -1,0 +1,265 @@
+Script started on Fri 24 Feb 2017 12:07:28 AM EST
+]0;fowler_l@cobra:~/CSC245/Progs/Prog2[?1034h[fowler_l@cobra Prog2]$ cat -n dc.cpp
+     1	#include <string>
+     2	#include "stack.h"
+     3	#include <iostream>
+     4	#include <fstream>
+     5	#include <cstdlib>
+     6	#include <locale>
+     7	#include "dsexceptions.h"
+     8	
+     9	
+    10	  using namespace std;
+    11	  void calculate(Stack <int> &dc, char operator1);
+    12	  void charFunction(Stack <int> &dc, char option);
+    13	  void readIn(Stack<int> &dc, string input);
+    14	 
+    15	  int main()
+    16	  {
+    17		Stack<int> dc;
+    18		string input;
+    19		
+    20		do
+    21		{
+    22			try
+    23			{
+    24				cin >> input;
+    25				readIn(dc ,input);
+    26			}
+    27			catch(DataError exc)
+    28			{
+    29				cout << "You have entered in invalid experssion! Please re-enter\n";	
+    30			}
+    31			catch(DivisionByZero exc)
+    32			{
+    33				cout<< "Division by zero no allowed -- Re-enter input.\n";
+    34			}
+    35			catch(Underflow exc)
+    36			{
+    37				cout<< " Illegal pop -- The stack is empty" << endl;
+    38			}
+    39			catch(Overflow exc)
+    40			{
+    41				cout<< "Illegal push -- Stack is full" << endl; 
+    42			}
+    43	
+    44		} while(cin); //loops while there is still input
+    45		
+    46	  }
+    47	
+    48	  void calculate(Stack <int> &dc, char operator1)
+    49	  {
+    50		//precondition: takes parameters of stack and a char that designates operation to be performed
+    51		//postcondition: performs designated operation and pushes answer back onto stack
+    52		
+    53		char operators [5]= {'+', '-', '*', '/', '%'};	
+    54		bool isOperator=false;
+    55		//checks to see if operator is a valid operator, else throws exception
+    56		for(int i=0; i<5; i++)
+    57		{
+    58			if(operator1==operators[i])
+    59			{
+    60				isOperator=true;
+    61			}			
+    62		}
+    63		if(isOperator==false)
+    64		{
+    65			throw DataError();
+    66		}
+    67		
+    68		//takes top two items off stack and performs operation
+    69		int x = dc.top();
+    70		dc.pop();
+    71		int y = dc.top();
+    72		dc.pop();
+    73	
+    74	
+    75		int answer;
+    76		
+    77		switch(operator1)
+    78		{
+    79			case '+':
+    80				answer = x + y;
+    81				dc.push(answer);
+    82				break;
+    83			case '-':
+    84				answer= y - x;
+    85				dc.push(answer);
+    86				break;
+    87			case '*':
+    88				answer = y*x;
+    89				dc.push(answer);
+    90				break;
+    91			case '/':
+    92				if(x == 0)
+    93				{
+    94					throw DivisionByZero();
+    95				}
+    96				else
+    97					answer = y/x;
+    98					dc.push(answer);
+    99				break;
+   100			case '%':
+   101				answer = y%x;
+   102				dc.push(answer);
+   103				break; 		
+   104		}
+   105	 }
+   106	
+   107	
+   108	 void charFunction(Stack <int> &dc, char option)
+   109	 {
+   110		//preconditon: takes paramters of stack and char option, enters switch statement  
+   111		//postcondition: performs operation designated by user and prints out stack values when needed
+   112		
+   113		//temp stack holds values when printing dc stack
+   114		Stack<int> temp;
+   115	
+   116		//used for switching top two values of stack
+   117		int x;
+   118		int y;
+   119		
+   120	
+   121		switch(option)
+   122		{
+   123			case 'p':
+   124				cout<< dc.top() << endl;
+   125				break;
+   126			case 'n':
+   127				cout<< dc.topAndPop();
+   128				break;
+   129			case 'f':
+   130				while(!dc.isEmpty())
+   131				{
+   132					cout<< dc.top()<< endl;
+   133					temp.push(dc.topAndPop());
+   134				}
+   135				while(!temp.isEmpty())
+   136				{
+   137					dc.push(temp.topAndPop());
+   138				}
+   139				break;
+   140			case 'c':
+   141				while(!dc.isEmpty())
+   142				{
+   143					dc.pop();
+   144				}
+   145				break;
+   146			case 'd':
+   147				dc.push(dc.top());
+   148				break;
+   149			case'r':
+   150				x=dc.top();
+   151				dc.pop();
+   152				y= dc.top();
+   153				dc.pop();
+   154				dc.push(x);
+   155				dc.push(y);
+   156				break;
+   157			default:
+   158				throw DataError();		
+   159				
+   160					
+   161		
+   162		}
+   163	
+   164	 }
+   165	
+   166	 void readIn(Stack <int> &dc, string input)
+   167	 {
+   168		//preconditon: takes input from the user, parses the string, and seperates it into different values
+   169		//postconditon: sends appropriate values to the right method
+   170	
+   171		string num;
+   172		bool negative = false;
+   173		int isChar;
+   174		int number;
+   175	
+   176			for(int i=0; i<input.length(); i++)
+   177			{
+   178				int x=i;
+   179				//isalpha checks to see if input is a character
+   180				isChar=isalpha(input[i]);
+   181				//does nothing if input[i] is a blank space
+   182				if(input[i] == ' ')
+   183				{
+   184	
+   185				}
+   186				//checks for negative value indication
+   187				if(isdigit(input[i]) || input[i] == '_')
+   188				{
+   189					if(input[i] == '_')
+   190					{
+   191						negative=true;
+   192						x=x+1;	
+   193					}
+   194					if(input[i] == '_' &&  !isdigit(input[i+1]))
+   195					{
+   196						throw DataError();
+   197					}
+   198					//appends numbers to string while next char is still an int
+   199					while(isdigit(input[x]))
+   200					{	
+   201						num+=input[x];
+   202						x++;		
+   203					}	
+   204						
+   205				   number = atoi(num.c_str());
+   206				   if(negative)
+   207				   {
+   208					number= -1 * number;				
+   209				   }
+   210	
+   211				   dc.push(number);
+   212				   i=x-1;
+   213				   //resets number
+   214				   num.clear();
+   215				}
+   216				//sends to charFunction if item at input[i] is a char
+   217				else if(isChar != 0)
+   218				{
+   219					charFunction(dc, input[i]);
+   220				}
+   221				else
+   222				{
+   223					calculate(dc, input[i]);	
+   224				}	
+   225						
+   226	 		}
+   227	 }	
+   228	
+]0;fowler_l@cobra:~/CSC245/Progs/Prog2[fowler_l@cobra Prog2]$ c++ dc.cpp
+]0;fowler_l@cobra:~/CSC245/Progs/Prog2[fowler_l@cobra Prog2]$ a.out
+2 3 +
+p
+5
+6 - p
+-1
+4 6 * + p
+23
+2 / p
+11
+4 5 % p
+3
+2 100 +
+2 3 4 5 f
+5
+4
+3
+102
+3
+5d*p
+25
+rf2pc
+5
+25
+4
+3
+102
+3
+2
+f
+]0;fowler_l@cobra:~/CSC245/Progs/Prog2[fowler_l@cobra Prog2]$ exit
+exit
+
+Script done on Fri 24 Feb 2017 12:09:03 AM EST

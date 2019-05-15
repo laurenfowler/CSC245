@@ -1,0 +1,310 @@
+Script started on Fri 10 Feb 2017 08:34:03 PM EST
+]0;fowler_l@cobra:~/CSC245/Progs/Prog1[?1034h[fowler_l@cobra Prog1]$ cat editor.cpp
+#include <iostream>
+#include <string>
+#include <cctype>
+#include <fstream>
+#include <cstdlib>
+#include "linelist.h"
+using namespace std;
+
+void PrintFile(ofstream& outfile, LineList& L, char *argv[]);
+void OpenFile (ifstream& infile, int argc, char *argv[]);
+void makeList(ifstream& infile, LineList& L);
+void insert(LineList& L);
+
+int main(int argc, char *argv[])
+{
+        LineList L;
+        ifstream infile;	
+	ofstream outfile;
+        OpenFile(infile, argc, argv);
+	makeList(infile, L);
+	L.printList();
+
+	
+	char option;		
+	do
+	{	
+	//	int currentLine = L.getCurrLineNum();
+		cout << ">" << L.getCurrLineNum();
+		cin>> option;
+
+		switch(option)
+		{
+			case 'I':
+				insert(L);
+		//		currentLine = L.getCurrLineNum();
+				break;
+			case 'D':
+				//seg fault, three pointers work when there is some space, need special case
+				L.deleteLine();	
+				break;
+			case 'L':
+				//fixed
+				L.printList();
+				break;
+			case 'P':
+				//fixed 
+				L.movePrevLine();
+				break;
+			case 'N':
+				//fixed
+				L.moveNextLine();
+				break; 
+		}
+	//	currentLine = L.getCurrLineNum();
+//		cout << ">" << L.getCurrLineNum()
+//		cin >> option;	
+	} while(option != 'E');
+	
+	PrintFile(outfile, L, argv); 
+	//method saves out to file 
+       
+	
+	 return 0;
+}
+
+void OpenFile (ifstream& infile, int argc, char *argv[])
+{
+        if (argc == 1)
+        {
+                cout << "Error!! No File Entered." << endl;
+                exit(1);
+        }
+
+        string filename = argv[1];
+        infile.open(filename.c_str());
+}
+
+//populates linked list
+void makeList(ifstream& infile, LineList& L)
+{
+	string s;
+	while(getline(infile, s))
+	{
+		L.insertLine(s);
+	}
+	
+}
+
+//inserts line below current line
+void insert(LineList& L)
+{
+	string s;
+	getline(cin, s);
+	L.insertLine(s);		
+}
+
+void PrintFile(ofstream& outfile, LineList& L, char *argv[])
+{
+        string filename = argv[1];
+        outfile.open(filename.c_str());
+	L.goToTop();
+
+	for(int i=0; i<L.getLength(); i++)
+	{
+		outfile << L.getCurrLine() << endl;
+		L.moveNextLine();
+	}
+}
+
+
+]0;fowler_l@cobra:~/CSC245/Progs/Prog1[fowler_l@cobra Prog1]$ cat linelist.pp[K[Kcpp
+#include <iostream>
+#include "linelist.h"
+
+using namespace std;
+
+LineList::LineList()
+{
+	LineNode *line = new LineNode;
+	LineNode *line2 = new LineNode;
+
+	line -> info = topMessage;
+	currLine = line;
+	currLineNum = 1;
+	length = 0;
+	line2 -> info = bottomMessage;
+	currLine -> back = NULL;
+	currLine -> next = line2;
+	line2 -> back = line;
+	line2 -> next = NULL;
+	currLineNum=0;	
+}
+
+void LineList::goToTop() 
+{
+	// Post : Advances currLine to line 1
+        while(currLine->info != topMessage)
+   	{
+		currLine =currLine -> back;
+//		currLineNum--;
+  	}
+//	currLineNum=0;
+	currLine = currLine -> next;
+	currLineNum=1;	
+
+}
+
+void LineList::goToBottom() 
+{
+	// Post : Advances currLine to last line
+	while(currLine -> info != bottomMessage)
+		currLine -> next;
+
+	currLine = currLine -> back;
+	currLineNum--; 
+
+		
+}
+
+void LineList::insertLine(string newLine)
+{
+	// post : newLine has been inserted after the current line	
+	
+	
+	//checks to make sure you are not inserting after bottom line
+	if(currLine -> info == bottomMessage)
+	{
+		currLine= currLine -> back;
+	}	
+	
+	LineNode *newNode = new LineNode;
+	newNode -> info = newLine;
+	newNode -> next = currLine -> next;
+	newNode -> back = currLine;
+	currLine -> next -> back = newNode;
+	currLine -> next = newNode;
+	currLine = newNode;
+	length++;
+	currLineNum++;
+}
+
+void LineList::deleteLine()
+{
+	// post : deletes the current line leaving currentLine
+	//	  pointing to line following
+	if(currLine -> info == topMessage || currLine -> info == bottomMessage)
+	{
+		return;
+	}	
+	else	
+	{
+		LineNode *line = new LineNode;
+		LineNode *line1 = new LineNode;
+		LineNode *tmpPtr= new LineNode;
+		line = currLine -> back;
+		line1 = currLine -> next;
+		tmpPtr = currLine;
+
+		line -> next = line1;
+		line1 -> back = line;
+		currLine = line;
+
+		delete tmpPtr;
+		
+		length--;
+		currLineNum--;
+	}
+
+}
+
+void LineList::printList() 
+{
+	LineNode *mark = currLine;
+ 	int markNum = currLineNum;
+	goToTop();
+  	while(currLine-> info != bottomMessage)
+	{
+		cout << ">"  << currLineNum;
+ 		cout << " " << currLine -> info << endl;  	
+		currLine = currLine -> next; 
+		currLineNum++;
+	}
+
+	currLine = mark;
+	currLineNum= markNum;
+   
+}
+
+string LineList::getCurrLine() const
+{	
+	return currLine -> info;
+
+}
+
+void LineList::moveNextLine()
+{
+	// Post : Advances currLine (unless already at last line)
+	if(currLine -> info != bottomMessage)
+	{
+		currLine = currLine -> next;
+		currLineNum++;
+	}	
+}
+
+void LineList::movePrevLine()
+{
+	// Post : Advances currLine (unless already at last line)
+	if( currLine -> info != topMessage)
+	{
+		currLine = currLine -> back;
+		currLineNum--;
+	}	
+	
+}
+int LineList::getCurrLineNum() const
+{ 
+	return currLineNum;
+}
+
+int LineList::getLength() const
+{
+	return length;
+}
+]0;fowler_l@cobra:~/CSC245/Progs/Prog1[fowler_l@cobra Prog1]$ c++ editor.cpp linelist.o
+]0;fowler_l@cobra:~/CSC245/Progs/Prog1[fowler_l@cobra Prog1]$ E[Ka.out tees[K[Kstfile
+>1 madre
+>2 padre
+>3 hermana
+>4 hermano
+>5  Me llamo Lauren
+>6 yo soy 
+>7 tu eres
+>8 El esta
+>9 nosotros somos
+>10 ustedes son
+>10 P
+>9 P
+>8 P
+>7 N
+>8 N
+>9 D
+>8 L
+>1 madre
+>2 padre
+>3 hermana
+>4 hermano
+>5  Me llamo Lauren
+>6 yo soy 
+>7 tu eres
+>8 El esta
+>9 ustedes son
+>8 I test
+>9 L
+>1 madre
+>2 padre
+>3 hermana
+>4 hermano
+>5  Me llamo Lauren
+>6 yo soy 
+>7 tu eres
+>8 El esta
+>9  test
+>10 ustedes son
+>9 E
+]0;fowler_l@cobra:~/CSC245/Progs/Prog1[fowler_l@cobra Prog1]$ exit
+exit
+
+Script done on Fri 10 Feb 2017 08:35:38 PM EST

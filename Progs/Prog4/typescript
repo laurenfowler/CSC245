@@ -1,0 +1,22 @@
+Script started on Wed 03 May 2017 08:44:05 PM EDT
+]0;fowler_l@cobra:~/CSC245/Progs/Prog4[?1034h[fowler_l@cobra Prog4]$ c++ dijkstra.cpp
+]0;fowler_l@cobra:~/CSC245/Progs/Prog4[fowler_l@cobra Prog4]$ a.out ginfile1.dat
+^^^^^^^^^^^^^^^^^^^^ DIJKSTRA'S ALGORITHM ^^^^^^^^^^^^^^^^^^^^^^
+
+
+	A Weighted Graph Has Been Built For These 7 Cities
+		Chicago		Austin		Atlanta
+		Houston		Denver		Dallas
+		Washington		
+ Please input your starting vertex: Chicago
+       Chicago                 0             N/A
+        Denver              1000         Chicago
+       Atlanta              2400          Denver
+    Washington              3000         Atlanta
+       Houston              3200         Atlanta
+        Dallas              4300      Washington
+        Austin              4500          Dallas
+]0;fowler_l@cobra:~/CSC245/Progs/Prog4[fowler_l@cobra Prog4]$ exit
+exit
+
+Script done on Wed 03 May 2017 08:44:25 PM EDT
